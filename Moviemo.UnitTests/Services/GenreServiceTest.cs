@@ -55,7 +55,7 @@ namespace Moviemo.UnitTests.Services
         }
 
         [Fact]
-        public async Task RemoveGenreAsync_ShouldRemoveValidGenre ()
+        public async Task RemoveGenreAsyncShouldRemoveGenre ()
         {
             using var repository = new MoviemoContext(options);
             genreService = new GenreService(repository);
@@ -66,25 +66,25 @@ namespace Moviemo.UnitTests.Services
             using var newRepositoryInstance = new MoviemoContext(options);
 
             var genres = await newRepositoryInstance.Genres.ToListAsync();
-            genres.Should().HaveCount(Constants.INITIAL_COUNT - 1);
+            genres.Should().HaveCount(Constants.INITIAL_GENRE_COUNT - 1);
             genres.Should().NotContain(Constants.VALID_GENRE);
         }
 
         [Fact]
         public async Task AddGenreAsync_ShouldAddGenre ()
         {
-            var genreToAdd = new Genre() { Name = "ABC" };
+            var newGenre = new Genre() { Name = "ABC" };
             using var repository = new MoviemoContext(options);
             genreService = new GenreService(repository);
 
-            await genreService.AddGenreAsync(genreToAdd);
+            await genreService.AddGenreAsync(newGenre);
 
             // Assert on different context
             using var newRepositoryInstance = new MoviemoContext(options);
 
             var genres = await newRepositoryInstance.Genres.ToListAsync();
-            genres.Should().HaveCount(Constants.INITIAL_COUNT + 1);
-            genres.Should().Contain(genre => genre.Name == genreToAdd.Name);
+            genres.Should().HaveCount(Constants.INITIAL_GENRE_COUNT + 1);
+            genres.Should().Contain(genre => genre.Name == newGenre.Name);
         }
 
 
@@ -106,9 +106,9 @@ namespace Moviemo.UnitTests.Services
             using var repository = new MoviemoContext(options);
             genreService = new GenreService(repository);
 
-            var result = await genreService.GetAllGenresAsync();
+            var movies = await genreService.GetAllGenresAsync();
 
-            result.Should().HaveCount(Constants.INITIAL_COUNT);
+            movies.Should().HaveCount(Constants.INITIAL_GENRE_COUNT);
         }
 
         public static IEnumerable<object[]> GetGenreTestData =>
