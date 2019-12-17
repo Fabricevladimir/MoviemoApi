@@ -53,7 +53,7 @@ namespace Moviemo.API.Services
 
         public async Task UpdateAsync ()
         {
-            throw new NotImplementedException();
+            await SaveChangesAsync();
         }
 
         private async Task SaveChangesAsync ()

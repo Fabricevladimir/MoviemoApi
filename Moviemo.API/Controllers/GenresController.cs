@@ -27,6 +27,19 @@ namespace Moviemo.API.Controllers
         }
 
         /// <summary>
+        /// Get all the genres
+        /// </summary>
+        /// <returns>Ennumerable collection of genres</returns>
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<GenreResource>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<GenreResource>>> GetGenres ()
+        {
+            var genres = await genreService.GetAllGenresAsync();
+
+            return Ok(mapper.Map<IEnumerable<GenreResource>>(genres));
+        }
+
+        /// <summary>
         /// Get a genre by its id
         /// </summary>
         /// <param name="id"></param>
@@ -34,7 +47,7 @@ namespace Moviemo.API.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(GenreResource), StatusCodes.Status200OK)]
-        public async Task<ActionResult<GenreResource>> GetOne (int id)
+        public async Task<ActionResult<GenreResource>> GetGenre (int id)
         {
             var genre = await genreService.GetGenreAsync(id);
 
@@ -48,46 +61,6 @@ namespace Moviemo.API.Controllers
         }
 
         /// <summary>
-        /// Create a genre
-        /// </summary>
-        /// <param name="resource"></param>
-        /// <returns>Newly created genre</returns>
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(GenreResource), StatusCodes.Status201Created)]
-        public async Task<ActionResult<GenreResource>> Create ([FromBody]SaveGenreResource resource)
-        {
-            if (genreService.GenreExists(resource.Name))
-            {
-                var message = Utils.ConflictMessage(
-                    typeof(Genre), nameof(resource.Name), resource.Name);
-
-                return Conflict(message);
-            }
-
-            var genre = mapper.Map<Genre>(resource);
-            await genreService.AddGenreAsync(genre);
-
-            var result = mapper.Map<GenreResource>(genre);
-
-            return CreatedAtAction(nameof(GetOne), new { id = result.Id }, result);
-        }
-
-        /// <summary>
-        /// Get all the genres
-        /// </summary>
-        /// <returns>Ennumerable collection of genres</returns>
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<GenreResource>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<GenreResource>>> GetAll ()
-        {
-            var genres = await genreService.GetAllGenresAsync();
-
-            return Ok(mapper.Map<List<GenreResource>>(genres));
-        }
-
-        /// <summary>
         /// Update a genre
         /// </summary>
         /// <param name="id"></param>
@@ -96,7 +69,7 @@ namespace Moviemo.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> Update (int id, [FromBody]GenreResource resource)
+        public async Task<ActionResult> PutGenre (int id, [FromBody]GenreResource resource)
         {
             if (id != resource.Id)
             {
@@ -117,14 +90,44 @@ namespace Moviemo.API.Controllers
         }
 
         /// <summary>
+        /// Create a genre
+        /// </summary>
+        /// <param name="resource"></param>
+        /// <returns>Newly created genre</returns>
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(GenreResource), StatusCodes.Status201Created)]
+        public async Task<ActionResult<GenreResource>> PostGenre ([FromBody]SaveGenreResource resource)
+        {
+            if (genreService.GenreExists(resource.Name))
+            {
+                var message = Utils.ConflictMessage(
+                    typeof(Genre), nameof(resource.Name), resource.Name);
+
+                return Conflict(message);
+            }
+
+            var genre = mapper.Map<Genre>(resource);
+            await genreService.AddGenreAsync(genre);
+
+            var result = mapper.Map<GenreResource>(genre);
+
+            return CreatedAtAction(nameof(GetGenre), new { id = result.Id }, result);
+        }
+
+
+
+
+        /// <summary>
         /// Remove a genre
         /// </summary>
         /// <param name="id"></param>
         /// <returns>Deleted genre</returns>
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult> Delete (int id)
+        public async Task<ActionResult<GenreResource>> DeleteGenre (int id)
         {
             var genre = await genreService.GetGenreAsync(id);
             if (genre == null)
@@ -134,8 +137,7 @@ namespace Moviemo.API.Controllers
             }
 
             await genreService.RemoveGenreAsync(genre);
-
-            return NoContent();
+            return Ok(mapper.Map<GenreResource>(genre));
         }
     }
 }

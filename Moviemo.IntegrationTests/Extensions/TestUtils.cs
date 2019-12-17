@@ -6,9 +6,6 @@ namespace Moviemo.IntegrationTests.Extensions
 {
     public static class TestUtils
     {
-        public const int InvalidGenreId = 100;
-        public const int InvalidMovieId = 100;
-
         public static void Init (MoviemoContext context)
         {
             if (context is null)
@@ -56,17 +53,6 @@ namespace Moviemo.IntegrationTests.Extensions
                 new Movie() { Id = 2, GenreId = 2, Title = "The Rainmaker"},
                 new Movie() { Id = 3, GenreId = 3, Title = "Jumanji"},
                 new Movie() { Id = 4, GenreId = 4, Title = "Me Before You"}
-            };
-        }
-
-        public static List<GenreResource> GetGenreResources ()
-        {
-            return new List<GenreResource>()
-            {
-                new GenreResource() { Id = 1, Name = "Action"},
-                new GenreResource() { Id = 2, Name = "Drama"},
-                new GenreResource() { Id = 3, Name = "Comedy"},
-                new GenreResource() { Id = 4, Name = "Romance"}
             };
         }
     }

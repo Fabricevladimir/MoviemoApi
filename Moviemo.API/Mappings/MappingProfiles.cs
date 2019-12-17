@@ -18,11 +18,15 @@ namespace Moviemo.API.Mappings
 
             // Reverse mapping
             CreateMap<SaveGenreResource, Genre>()
-                .ForMember(genre => genre.Movies, opt => opt.Ignore())
-                .ForMember(genre => genre.Id, opt => opt.Ignore());
+                .ForMember(genre => genre.Id, opt => opt.Ignore())
+                .ForMember(genre => genre.Movies, opt => opt.Ignore());
 
             CreateMap<GenreResource, Genre>()
                 .ForMember(genre => genre.Movies, opt => opt.Ignore());
+
+            CreateMap<SaveMovieResource, Movie>()
+                .ForMember(m => m.Id, opt => opt.Ignore())
+                .ForMember(m => m.Genre, opt => opt.Ignore());
 
             CreateMap<MovieResource, Movie>()
                 .ForMember(m => m.Title, opt => opt.MapFrom(mr => mr.Title))

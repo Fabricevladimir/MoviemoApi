@@ -3,8 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Moviemo.API.Data;
 using Moviemo.API.Models;
 using Moviemo.API.Services;
+using Moviemo.IntegrationTests.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -12,18 +14,23 @@ namespace Moviemo.UnitTests.Services
 {
     public sealed class GenreServiceTest : BaseServiceUnitTest, IDisposable
     {
+        private const int VALID_GENRE_ID = 1;
+        private const int INVALID_GENRE_ID = 100;
+        private const string VALID_GENRE_NAME = "Action";
+        private const string INVALID_GENRE_NAME = "Invalid";
+
+        private readonly List<Genre> Genres;
         private IGenreService genreService;
 
-        public void Dispose ()
+        public GenreServiceTest ()
         {
-            connection.Close();
-            connection.Dispose();
+            Genres = TestUtils.GetGenres();
         }
 
         [Theory]
-        [InlineData(Constants.VALID_GENRE_ID, true)]
-        [InlineData(Constants.INVALID_GENRE_ID, false)]
-        public void GenreExists_ShouldFindGenreById (int id, bool expected)
+        [InlineData(VALID_GENRE_ID, true)]
+        [InlineData(INVALID_GENRE_ID, false)]
+        public void GenreExistsShouldFindGenreById (int id, bool expected)
         {
             using var repository = new MoviemoContext(options);
             genreService = new GenreService(repository);
@@ -32,9 +39,9 @@ namespace Moviemo.UnitTests.Services
         }
 
         [Theory]
-        [InlineData(Constants.VALID_GENRE_NAME, true)]
-        [InlineData(Constants.INVALID_GENRE_NAME, false)]
-        public void GenreExists_ShouldFindGenreByName (string name, bool expected)
+        [InlineData(VALID_GENRE_NAME, true)]
+        [InlineData(INVALID_GENRE_NAME, false)]
+        public void GenreExistsShouldFindGenreByName (string name, bool expected)
         {
             using var repository = new MoviemoContext(options);
             genreService = new GenreService(repository);
@@ -44,7 +51,7 @@ namespace Moviemo.UnitTests.Services
 
         [Theory]
         [MemberData(nameof(GetGenreTestData))]
-        public async Task GetGenreAsync_ShouldReturnGenreWithGivenId (int id, Genre expected)
+        public async Task GetGenreAsyncShouldReturnGenreWithGivenId (int id, Genre expected)
         {
             using var repository = new MoviemoContext(options);
             genreService = new GenreService(repository);
@@ -57,21 +64,22 @@ namespace Moviemo.UnitTests.Services
         [Fact]
         public async Task RemoveGenreAsyncShouldRemoveGenre ()
         {
+            var genre = Genres.First();
             using var repository = new MoviemoContext(options);
             genreService = new GenreService(repository);
 
-            await genreService.RemoveGenreAsync(Constants.VALID_GENRE);
+            await genreService.RemoveGenreAsync(genre);
 
             // Assert on different context
             using var newRepositoryInstance = new MoviemoContext(options);
 
             var genres = await newRepositoryInstance.Genres.ToListAsync();
-            genres.Should().HaveCount(Constants.INITIAL_GENRE_COUNT - 1);
-            genres.Should().NotContain(Constants.VALID_GENRE);
+            genres.Should().HaveCount(Genres.Count - 1);
+            genres.Should().NotContain(genre);
         }
 
         [Fact]
-        public async Task AddGenreAsync_ShouldAddGenre ()
+        public async Task AddGenreAsyncShouldAddOneGenre ()
         {
             var newGenre = new Genre() { Name = "ABC" };
             using var repository = new MoviemoContext(options);
@@ -83,39 +91,47 @@ namespace Moviemo.UnitTests.Services
             using var newRepositoryInstance = new MoviemoContext(options);
 
             var genres = await newRepositoryInstance.Genres.ToListAsync();
-            genres.Should().HaveCount(Constants.INITIAL_GENRE_COUNT + 1);
+            genres.Should().HaveCount(Genres.Count + 1);
             genres.Should().Contain(genre => genre.Name == newGenre.Name);
         }
 
 
         [Fact]
-        public void RemoveGenreAsync_ShouldThrowWhenRemovingInvalidGenre ()
+        public void RemoveGenreAsyncShouldThrowWhenRemovingInvalidGenre ()
         {
+            var genre = new Genre() { Id = INVALID_GENRE_ID };
             using var repository = new MoviemoContext(options);
             genreService = new GenreService(repository);
 
             Func<Task> sutMethod = async () =>
-                await genreService.RemoveGenreAsync(Constants.INVALID_GENRE);
+                await genreService.RemoveGenreAsync(genre);
 
             sutMethod.Should().Throw<DbUpdateConcurrencyException>();
         }
 
         [Fact]
-        public async Task GetAllGenresAsync_ShouldReturnAllGenres ()
+        public async Task GetAllGenresAsyncShouldReturnAllGenres ()
         {
             using var repository = new MoviemoContext(options);
             genreService = new GenreService(repository);
 
-            var movies = await genreService.GetAllGenresAsync();
+            var genres = await genreService.GetAllGenresAsync();
 
-            movies.Should().HaveCount(Constants.INITIAL_GENRE_COUNT);
+            genres.Should().HaveCount(Genres.Count);
         }
 
+        public void Dispose ()
+        {
+            connection.Close();
+            connection.Dispose();
+        }
+
+        private static readonly Genre Genre = new Genre() { Id = VALID_GENRE_ID, Name = VALID_GENRE_NAME };
         public static IEnumerable<object[]> GetGenreTestData =>
             new List<object[]>
             {
-                new object[] { Constants.VALID_GENRE_ID, Constants.VALID_GENRE },
-                new object[] { Constants.INVALID_GENRE_ID, null }
+                new object[] { VALID_GENRE_ID, Genre },
+                new object[] { INVALID_GENRE_ID, null }
             };
     }
 }
