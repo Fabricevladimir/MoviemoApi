@@ -21,11 +21,11 @@ namespace Moviemo.API.Extensions
                     var feature = context.Features.Get<IExceptionHandlerFeature>();
                     if (feature == null) return;
 
-                    logger.LogError($"Something went wrong: {feature.Error}");
+                    logger.LogError($"----------------------------------------------------------------------------Something went wrong: {feature.Error}");
 
                     var error = new ErrorDetail()
                     {
-                        Message = "Internal Server Error.",
+                        Message = feature.Error.ToString(),
                         StatusCode = context.Response.StatusCode
                     };
 

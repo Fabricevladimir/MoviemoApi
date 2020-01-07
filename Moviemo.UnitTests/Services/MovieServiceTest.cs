@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Moviemo.API.Data;
 using Moviemo.API.Models;
 using Moviemo.API.Services;
-using Moviemo.IntegrationTests.Extensions;
+using Moviemo.IntegrationTests.Setup;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +25,7 @@ namespace Moviemo.UnitTests.Services
 
         public MovieServiceTest ()
         {
-            Movies = TestUtils.GetMovies();
+            Movies = TestData.Movies;
         }
 
         [Theory]

@@ -4,11 +4,9 @@ using Moq;
 using Moviemo.API.Controllers;
 using Moviemo.API.Models;
 using Moviemo.API.Services;
-using Moviemo.IntegrationTests.Extensions;
-using System;
+using Moviemo.IntegrationTests.Setup;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -24,7 +22,7 @@ namespace Moviemo.UnitTests.Controllers
 
         public MoviesControllerTest ()
         {
-            Movies = TestUtils.GetMovies();
+            Movies = TestData.Movies;
             MovieResources = mapper.Map<List<MovieResource>>(Movies);
             mockGenreService = new Mock<IGenreService>(MockBehavior.Strict);
             mockMovieService = new Mock<IMovieService>(MockBehavior.Strict);

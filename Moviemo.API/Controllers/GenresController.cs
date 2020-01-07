@@ -7,8 +7,10 @@ using Moviemo.API.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
+[assembly: InternalsVisibleTo("Moviemo.UnitTests")]
 namespace Moviemo.API.Controllers
 {
     [ApiController]

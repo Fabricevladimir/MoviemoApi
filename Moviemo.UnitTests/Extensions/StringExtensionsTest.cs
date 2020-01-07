@@ -11,7 +11,7 @@ namespace Moviemo.UnitTests.Extensions
         [InlineData(null, "")]
         [InlineData("abc", "Abc")]
         [InlineData("abc def", "Abc def")]
-        public void CapitalizeFirstLetter_ShouldRun (string value, string expected)
+        public void CapitalizeFirstLetterShouldRun (string value, string expected)
         {
             value.CapitalizeFirstLetter().Should().Be(expected);
         }

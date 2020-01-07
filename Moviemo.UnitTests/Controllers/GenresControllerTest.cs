@@ -4,8 +4,9 @@ using Moq;
 using Moviemo.API.Controllers;
 using Moviemo.API.Models;
 using Moviemo.API.Services;
-using Moviemo.IntegrationTests.Extensions;
+using Moviemo.IntegrationTests.Setup;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -18,11 +19,12 @@ namespace Moviemo.UnitTests.Controllers
         private readonly List<Genre> Genres;
         private readonly Mock<IGenreService> mockGenreService;
         private readonly List<GenreResource> GenreResources;
+        class InvalidGenre : DynamicObject { }
 
 
         public GenresControllerTest ()
         {
-            Genres = TestUtils.GetGenres();
+            Genres = TestData.Genres;
             GenreResources = mapper.Map<List<GenreResource>>(Genres);
             mockGenreService = new Mock<IGenreService>(MockBehavior.Strict);
         }
@@ -73,6 +75,7 @@ namespace Moviemo.UnitTests.Controllers
             (result.Result as OkObjectResult).Value
                 .Should().BeEquivalentTo(expected);
         }
+
 
         [Fact]
         public async Task PutGenreShouldReturnBadRequestWhenEnpointIdAndResourceIdDoNotMatch ()

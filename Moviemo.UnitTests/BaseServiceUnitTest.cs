@@ -1,8 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Moviemo.API.Data;
-using Moviemo.IntegrationTests.Extensions;
-using System;
+using Moviemo.IntegrationTests.Setup;
 
 namespace Moviemo.UnitTests
 {
@@ -21,8 +20,8 @@ namespace Moviemo.UnitTests
                 .Options;
 
             using var context = new MoviemoContext(options);
-            context.Database.EnsureCreated();
-            TestUtils.Init(context);
+            var db = new TestData(context);
+            db.SeedDatabase();
         }
     }
 }
